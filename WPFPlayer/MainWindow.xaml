@@ -1,0 +1,404 @@
+﻿<Window x:Class="WPFPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:conv="clr-namespace:NKristek.Wpf.Converters;assembly=NKristek.Wpf.Converters"
+        xmlns:converters="clr-namespace:WPFPlayer.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
+        xmlns:local="clr-namespace:WPFPlayer"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:properties="clr-namespace:WPFPlayer.Properties"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:views="clr-namespace:WPFPlayer.Views"
+        xmlns:vm="clr-namespace:WPFPlayer.ViewModels"
+        Title="WPF Player"
+        Width="{Binding Width, Mode=TwoWay}"
+        Height="{Binding Height, Mode=TwoWay}"
+        d:Height="450"
+        d:Width="800"
+        ui:TitleBar.BackButtonStyle="{DynamicResource AppTitleBarBackButtonStyle}"
+        ui:TitleBar.ExtendViewIntoTitleBar="True"
+        ui:TitleBar.IsBackButtonVisible="True"
+        ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        AllowDrop="True"
+        AllowsTransparency="{Binding TransparentOnMouseEnter, Mode=OneTime}"
+        DataContext="{x:Static vm:MainViewModel.Instance}"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=Left, Mode=TwoWay}"
+        Loaded="Window_Loaded"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=Top, Mode=TwoWay}"
+        Topmost="{Binding Source={x:Static properties:Settings.Default}, Path=TopMost, Mode=TwoWay}"
+        WindowState="{Binding Source={x:Static properties:Settings.Default}, Path=WindowState}"
+        WindowStyle="None"
+        mc:Ignorable="d">
+    <Window.Resources>
+        <Style x:Key="AppTitleBarStyle" TargetType="ui:TitleBarControl">
+            <Setter Property="Visibility" Value="{Binding IsVisibleUIs, Converter={conv:BoolToVisibilityConverter}}" />
+        </Style>
+        <Style x:Key="AppTitleBarBackButtonStyle"
+               BasedOn="{StaticResource TitleBarBackButtonStyle}"
+               TargetType="ui:TitleBarButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Content" Value="M 0 0 h 20 v 2 h -20 z M 0 9 h 20 v 2 h -20 z M 0 18 h 20 v 2 h -20 z" />
+            <EventSetter Event="Click" Handler="TitleBarButton_Click" />
+        </Style>
+    </Window.Resources>
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Audio">
+                <MenuItem Command="{Binding VolumeUpCommand}"
+                          Header="Increase Volume"
+                          InputGestureText="Up">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE995;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding VolumeUpCommand}"
+                          Header="Decrease Volume"
+                          InputGestureText="Down">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE993;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding ToggleMuteCommand}"
+                          Header="Mute"
+                          InputGestureText="M">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE74F;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+            </MenuItem>
+
+            <MenuItem Header="Video">
+                <MenuItem Command="{Binding ToggleFullScreenCommand}"
+                          Header="Fullscreen"
+                          InputGestureText="F11">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE740;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Crop">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE7A8;" />
+                    </MenuItem.Icon>
+                    <MenuItem Command="{Binding ToggleVideoCropCommand}"
+                              Header="Cycle video crop"
+                              InputGestureText="C" />
+                    <Separator />
+                    <MenuItem Header="Default"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCropDefault}" />
+                    <MenuItem Header="16:10"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop16x10}" />
+                    <MenuItem Header="16:9"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop16x9}" />
+                    <MenuItem Header="4:3"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop4x3}" />
+                    <MenuItem Header="1.85:1"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop1p85x1}" />
+                    <MenuItem Header="2.21:1"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop2p21x1}" />
+                    <MenuItem Header="2.35:1"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop2p35x1}" />
+                    <MenuItem Header="2.39:1"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop2p39x1}" />
+                    <MenuItem Header="5:3"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop5x3}" />
+                    <MenuItem Header="5:4"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop5x4}" />
+                    <MenuItem Header="1:1"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsCrop1x1}" />
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="Playback">
+                <MenuItem Command="{Binding VeryShortBackwardCommand}"
+                          Header="3 Sec. Backward"
+                          InputGestureText="Left">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE72A;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding VeryShortBackwardCommand}"
+                          Header="3 Sec. Forward"
+                          InputGestureText="Right">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE72B;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Command="{Binding PlayPauseCommand}"
+                          Header="{Binding PlayPauseLabel}"
+                          Icon="{Binding PlayPauseIcon}"
+                          InputGestureText="Space" />
+                <MenuItem Command="{Binding StopCommand}"
+                          Header="Stop"
+                          InputGestureText="S">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE71A;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding PreviousMediaCommand}"
+                          Header="Previous"
+                          InputGestureText="P">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE892;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding NextMediaCommand}"
+                          Header="Next"
+                          InputGestureText="N">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE893;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <Separator />
+
+            <MenuItem Header="View">
+                <MenuItem Header="Always on top"
+                          IsCheckable="True"
+                          IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=TopMost}" />
+                <MenuItem Header="Minimize on Mouse Enter"
+                          IsCheckable="True"
+                          IsChecked="{Binding MinimizeOnMouseEnter}" />
+                <MenuItem Header="Transparent on Mouse Enter"
+                          InputGestureText="Ctrl+T"
+                          IsCheckable="True"
+                          IsChecked="{Binding TransparentOnMouseEnter}" />
+            </MenuItem>
+
+            <MenuItem Header="Open Media">
+                <MenuItem Command="{Binding OpenFilesCommand}"
+                          Header="Open File(s)..."
+                          InputGestureText="Ctrl+O">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE8E5;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding OpenURLCommand}"
+                          Header="Open URL..."
+                          InputGestureText="Ctrl+U">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE774;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding OpenFolderCommand}"
+                          Header="Open Folder..."
+                          InputGestureText="Ctrl+F">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE838;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <Separator />
+            <MenuItem Header="Help">
+                <MenuItem Command="{Binding HelpCommand}"
+                          Header="Help"
+                          InputGestureText="F1">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE897;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding CheckForUpdateCommand}" Header="Check for Updates...">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE777;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Command="{Binding AboutCommand}"
+                          Header="About..."
+                          InputGestureText="Shift+F1" />
+            </MenuItem>
+        </ContextMenu>
+    </Window.ContextMenu>
+    <Window.InputBindings>
+
+        <!--  Audio  -->
+
+        <KeyBinding Key="Up" Command="{Binding VolumeUpCommand}" />
+        <KeyBinding Key="Down" Command="{Binding VolumeDownCommand}" />
+        <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
+
+        <!--  Video  -->
+
+        <KeyBinding Key="F11" Command="{Binding ToggleFullScreenCommand}" />
+
+        <KeyBinding Key="C" Command="{Binding ToggleVideoCropCommand}" />
+
+        <!--  Playback  -->
+
+        <KeyBinding Key="Left" Command="{Binding VeryShortBackwardCommand}" />
+        <KeyBinding Key="Right" Command="{Binding VeryShortForwardCommand}" />
+
+        <KeyBinding Key="Space" Command="{Binding PlayPauseCommand}" />
+        <KeyBinding Key="S" Command="{Binding StopCommand}" />
+        <KeyBinding Key="P" Command="{Binding PreviousMediaCommand}" />
+        <KeyBinding Key="N" Command="{Binding NextMediaCommand}" />
+
+        <!--  View  -->
+
+        <KeyBinding Key="T"
+                    Command="{Binding ToggleTransparentOnMouseEnter}"
+                    Modifiers="Ctrl" />
+
+        <!--  Open Media  -->
+
+        <KeyBinding Key="O"
+                    Command="{Binding OpenFilesCommand}"
+                    Modifiers="Ctrl" />
+        <KeyBinding Key="U"
+                    Command="{Binding OpenURLCommand}"
+                    Modifiers="Ctrl" />
+        <KeyBinding Key="F"
+                    Command="{Binding OpenFolderCommand}"
+                    Modifiers="Ctrl" />
+
+        <!--  Help  -->
+        <KeyBinding Key="F1" Command="{Binding HelpCommand}" />
+        <KeyBinding Key="F1"
+                    Command="{Binding AboutCommand}"
+                    Modifiers="Shift" />
+
+    </Window.InputBindings>
+    <behaviors:Interaction.Triggers>
+        <behaviors:EventTrigger EventName="Drop">
+            <behaviors:InvokeCommandAction Command="{Binding DropObjectsCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+
+        <behaviors:EventTrigger EventName="MouseWheel">
+            <behaviors:InvokeCommandAction Command="{Binding WheelCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+        <behaviors:EventTrigger EventName="MouseDoubleClick">
+            <behaviors:InvokeCommandAction Command="{Binding ToggleFullScreenCommand}" />
+        </behaviors:EventTrigger>
+        <behaviors:EventTrigger EventName="MouseMove">
+            <behaviors:InvokeCommandAction Command="{Binding MouseMoveCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+        <behaviors:EventTrigger EventName="MouseEnter">
+            <behaviors:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+
+    </behaviors:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ffme:MediaElement x:Name="Media"
+                           Grid.Row="0"
+                           Grid.RowSpan="2"
+                           IsMuted="{Binding IsMuted, Mode=TwoWay}"
+                           LoadedBehavior="Play"
+                           MediaClosed="Media_MediaClosed"
+                           MediaOpening="Media_MediaOpening"
+                           Position="{Binding SeekTime}"
+                           UnloadedBehavior="Manual"
+                           Volume="{Binding Volume, Mode=TwoWay}">
+            <behaviors:Interaction.Triggers>
+                <behaviors:EventTrigger EventName="MediaStateChanged" SourceObject="{Binding ElementName=Media}">
+                    <behaviors:InvokeCommandAction Command="{Binding MediaStateChangedCommand}" PassEventArgsToCommand="True" />
+                </behaviors:EventTrigger>
+            </behaviors:Interaction.Triggers>
+        </ffme:MediaElement>
+        <Grid Grid.Row="1"
+              Background="#7F000000"
+              Visibility="{Binding IsVisibleUIs, Converter={conv:BoolToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding SeekTime, Converter={converters:TimeSpanToStringConverter}}" />
+                <Slider x:Name="slider"
+                        Grid.Column="1"
+                        Focusable="False"
+                        IsMoveToPointEnabled="True"
+                        Maximum="{Binding TotalTime, Converter={converters:TimeSpanToDoubleConverter}}"
+                        Value="{Binding SeekTime, Converter={converters:TimeSpanToDoubleConverter}}" />
+                <TextBlock Grid.Column="2"
+                           Margin="10,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding TotalTime, Converter={converters:TimeSpanToStringConverter}}" />
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:CommandBar Grid.Column="0"
+                               HorizontalAlignment="Left"
+                               Background="Transparent">
+                    <ui:AppBarButton Command="{Binding PlayPauseCommand}"
+                                     Icon="{Binding PlayPauseIcon}"
+                                     Label="{Binding PlayPauseLabel}"
+                                     LabelPosition="Collapsed" />
+
+                    <ui:AppBarSeparator />
+
+                    <ui:AppBarButton Command="{Binding PreviousMediaCommand}"
+                                     Label="Previous"
+                                     LabelPosition="Collapsed">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Glyph="&#xF8AC;" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+                    <ui:AppBarButton Command="{Binding StopCommand}"
+                                     Icon="Stop"
+                                     Label="Stop"
+                                     LabelPosition="Collapsed" />
+                    <ui:AppBarButton Command="{Binding NextMediaCommand}"
+                                     Label="Next"
+                                     LabelPosition="Collapsed">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Glyph="&#xF8AD;" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+
+                    <ui:AppBarSeparator />
+
+                    <ui:AppBarButton Icon="Setting"
+                                     Label="Settings"
+                                     LabelPosition="Collapsed" />
+                </ui:CommandBar>
+                <ui:CommandBar Grid.Column="1" Background="Transparent">
+                    <ui:AppBarButton Command="{Binding ToggleMuteCommand}"
+                                     Icon="{Binding VolumeIcon}"
+                                     Label="{Binding Volume, Converter={converters:VolumeToStringConverter}}" />
+                </ui:CommandBar>
+            </Grid>
+        </Grid>
+
+        <views:NotificationBar Grid.Row="0"
+                               Margin="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarMarginConverter}}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Top"
+                               FontSize="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarFontSizeConverter}}"
+                               Foreground="White" />
+    </Grid>
+</Window>

@@ -1,0 +1,23 @@
+﻿<Window x:Class="WPFPlayer.Views.OpenUrlWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:WPFPlayer.Views"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        Title="Open URL"
+        Width="450"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d">
+    <StackPanel Margin="20" Orientation="Vertical">
+        <TextBox x:Name="txtURL" Margin="0,0,0,10" />
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Margin="0,0,10,0"
+                    Click="btnOK_Click"
+                    Content="OK" />
+            <Button Click="btnCancel_Click" Content="Cancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>
