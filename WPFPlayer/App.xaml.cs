@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using ModernWpf;
 
 namespace WPFPlayer
 {
@@ -37,7 +38,16 @@ namespace WPFPlayer
             else
             {
                 isUpdatingOnStartup = false;
-            }    
+            }
+
+            if(Settings.Default.IsInitialized)
+            {
+                Settings.Default.IsInitialized = false;
+            }
+            else
+            {
+                ThemeManager.Current.ApplicationTheme = Settings.Default.Theme;
+            }
         }
 
         private bool isUpdatingOnStartup = true;
@@ -64,6 +74,7 @@ namespace WPFPlayer
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
+            Settings.Default.Theme = ThemeManager.Current.ActualApplicationTheme;
             Settings.Default.Save();
         }
     }

@@ -42,6 +42,7 @@
                TargetType="ui:TitleBarButton">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Content" Value="M 0 0 h 20 v 2 h -20 z M 0 9 h 20 v 2 h -20 z M 0 18 h 20 v 2 h -20 z" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
             <EventSetter Event="Click" Handler="TitleBarButton_Click" />
         </Style>
     </Window.Resources>
@@ -183,11 +184,14 @@
                           IsChecked="{Binding TransparentOnMouseEnter}" />
 
                 <Separator />
+
                 <MenuItem Header="Minimal Interface"
                           InputGestureText="Ctrl+H"
                           IsCheckable="True"
                           IsChecked="{Binding IsMinimalInterface}" />
-
+                <MenuItem Header="Dark Mode"
+                          IsCheckable="True"
+                          IsChecked="{Binding IsDarkMode}" />
 
             </MenuItem>
 
@@ -330,7 +334,7 @@
             </behaviors:Interaction.Triggers>
         </ffme:MediaElement>
         <Grid Grid.Row="1"
-              Background="#7F000000"
+              Background="{DynamicResource SystemControlBackgroundAltMediumLowBrush}"
               Visibility="{Binding IsVisibleUIs, Converter={conv:BoolToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

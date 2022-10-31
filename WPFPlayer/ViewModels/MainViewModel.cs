@@ -21,6 +21,7 @@ using DragEventArgs = System.Windows.DragEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using AutoUpdaterDotNET;
 using System.Diagnostics;
+using ModernWpf;
 
 namespace WPFPlayer.ViewModels
 {
@@ -497,6 +498,29 @@ namespace WPFPlayer.ViewModels
                         Height += 124;
                     }
                 }
+            }
+        }
+
+        public bool IsDarkMode
+        {
+            get => ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark;
+            set
+            {
+                if (value == (ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark))
+                {
+                    return;
+                }
+
+                if (value)
+                {
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+                }
+                else
+                {
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
+                }
+
+                OnPropertyChanged(nameof(IsDarkMode));
             }
         }
 

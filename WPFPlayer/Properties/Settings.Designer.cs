@@ -142,5 +142,29 @@ namespace WPFPlayer.Properties {
                 this["IsMinimalInterface"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsInitialized {
+            get {
+                return ((bool)(this["IsInitialized"]));
+            }
+            set {
+                this["IsInitialized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Dark")]
+        public global::ModernWpf.ApplicationTheme Theme {
+            get {
+                return ((global::ModernWpf.ApplicationTheme)(this["Theme"]));
+            }
+            set {
+                this["Theme"] = value;
+            }
+        }
     }
 }
