@@ -130,5 +130,17 @@ namespace WPFPlayer.Properties {
                 this["LastUpdateCheckTime"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsMinimalInterface {
+            get {
+                return ((bool)(this["IsMinimalInterface"]));
+            }
+            set {
+                this["IsMinimalInterface"] = value;
+            }
+        }
     }
 }

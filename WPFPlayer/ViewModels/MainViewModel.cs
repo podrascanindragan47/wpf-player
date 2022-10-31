@@ -65,17 +65,17 @@ namespace WPFPlayer.ViewModels
                 PlayPauseCommand.NotifyCanExecuteChanged();
             }
 
-            _timerHideControls.Interval = 300;
+            _timerHideControls.Interval = 2000;
             _timerHideControls.Tick += timerHideControls_Tick;
         }
 
         private void timerHideControls_Tick(object sender, EventArgs e)
         {
-            if((DateTime.Now - _lastMouseMoveTime).TotalSeconds >= 2)
+            if (IsMinimalInterface)
             {
-                _timerHideControls.Stop();
                 IsVisibleUIs = false;
             }
+            _timerHideControls.Stop();
         }
 
         private Timer _timerHideControls = new Timer();
@@ -184,10 +184,11 @@ namespace WPFPlayer.ViewModels
             get => Settings.Default.Width;
             set
             {
-                if (Settings.Default.WindowState != WindowState.Maximized)
+                if (WindowState != WindowState.Maximized)
                 {
                     Settings.Default.Width = value;
                 }
+                OnPropertyChanged(nameof(Width));
             }
         }
         public double Height
@@ -195,10 +196,25 @@ namespace WPFPlayer.ViewModels
             get => Settings.Default.Height;
             set
             {
-                if (Settings.Default.WindowState != WindowState.Maximized)
+                if (WindowState != WindowState.Maximized)
                 {
                     Settings.Default.Height = value;
                 }
+                OnPropertyChanged(nameof(Height));
+            }
+        }
+        public WindowState WindowState
+        {
+            get => Settings.Default.WindowState;
+            set
+            {
+                if(Settings.Default.WindowState == value)
+                {
+                    return;
+                }
+                Settings.Default.WindowState = value;
+                OnPropertyChanged(nameof(WindowState));
+                OnPropertyChanged(nameof(IsMinimalInterface));
             }
         }
 
@@ -452,6 +468,38 @@ namespace WPFPlayer.ViewModels
         public IconElement PlayPauseIcon => Media.MediaState != MediaPlaybackState.Play ? new SymbolIcon((Symbol)0xF5B0) : new SymbolIcon((Symbol)0xF8AE);
         public string PlayPauseLabel => Media.MediaState != MediaPlaybackState.Play ? "Play" : "Pause";
 
+        public bool IsMinimalInterface
+        {
+            get
+            {
+                if(WindowState == WindowState.Maximized)
+                {
+                    return true;
+                }
+                return Settings.Default.IsMinimalInterface;
+            }
+            set
+            {
+                if(Settings.Default.IsMinimalInterface == value)
+                {
+                    return;
+                }
+                Settings.Default.IsMinimalInterface = value;
+                OnPropertyChanged(nameof(IsMinimalInterface));
+                if(WindowState != WindowState.Maximized)
+                {
+                    if (IsMinimalInterface)
+                    {
+                        Height -= 124;
+                    }
+                    else
+                    {
+                        Height += 124;
+                    }
+                }
+            }
+        }
+
         private RelayCommand _openFilesCommand;
         public RelayCommand OpenFilesCommand => _openFilesCommand ?? (_openFilesCommand = new RelayCommand(async () =>
         {
@@ -574,13 +622,13 @@ namespace WPFPlayer.ViewModels
         private RelayCommand _toggleFullScreenCommand;
         public RelayCommand ToggleFullScreenCommand => _toggleFullScreenCommand ?? (_toggleFullScreenCommand = new RelayCommand(() =>
         {
-            if(Settings.Default.WindowState == WindowState.Maximized)
+            if(WindowState == WindowState.Maximized)
             {
-                Settings.Default.WindowState = WindowState.Normal;
+                WindowState = WindowState.Normal;
             }
             else
             {
-                Settings.Default.WindowState = WindowState.Maximized;
+                WindowState = WindowState.Maximized;
             }
         }));
 
@@ -605,13 +653,15 @@ namespace WPFPlayer.ViewModels
             showVolumeNotification();
         }));
 
-        private DateTime _lastMouseMoveTime = DateTime.Now;
         private RelayCommand<MouseEventArgs> _mouseMoveCommand;
         public RelayCommand<MouseEventArgs> MouseMoveCommand => _mouseMoveCommand ?? (_mouseMoveCommand = new RelayCommand<MouseEventArgs>((e) =>
         {
             IsVisibleUIs = true;
-            _lastMouseMoveTime = DateTime.Now;
-            _timerHideControls.Start();
+            if (IsMinimalInterface)
+            {
+                _timerHideControls.Stop();
+                _timerHideControls.Start();
+            }
         }));
 
         private RelayCommand<MouseEventArgs> _mouseEnterCommand;
@@ -621,7 +671,7 @@ namespace WPFPlayer.ViewModels
             {
                 if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
                 {
-                    Settings.Default.WindowState = WindowState.Minimized;
+                    WindowState = WindowState.Minimized;
                     await Media.Pause();
                 }
                 else
@@ -728,6 +778,12 @@ namespace WPFPlayer.ViewModels
         public RelayCommand AboutCommand => _aboutCommand ?? (_aboutCommand = new RelayCommand(() =>
         {
             new AboutWindow().ShowDialog();
+        }));
+
+        private RelayCommand _toggleMinimalInterface;
+        public RelayCommand ToggleMinimalInterface => _toggleMinimalInterface ?? (_toggleMinimalInterface = new RelayCommand(() =>
+        {
+            IsMinimalInterface = !IsMinimalInterface;
         }));
 
         private async Task startMedia()
