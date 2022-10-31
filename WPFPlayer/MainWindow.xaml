@@ -20,6 +20,7 @@
         ui:TitleBar.BackButtonStyle="{DynamicResource AppTitleBarBackButtonStyle}"
         ui:TitleBar.ExtendViewIntoTitleBar="{Binding IsMinimalInterface}"
         ui:TitleBar.IsBackButtonVisible="True"
+        ui:TitleBar.IsIconVisible="True"
         ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
         ui:WindowHelper.UseModernWindowStyle="True"
         AllowDrop="True"
