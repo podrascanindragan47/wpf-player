@@ -7,6 +7,7 @@ using WPFPlayer.Messages;
 using WPFPlayer.ViewModels;
 using PInvoke;
 using static PInvoke.User32;
+using static PInvoke.Kernel32;
 
 namespace WPFPlayer
 {
@@ -26,9 +27,15 @@ namespace WPFPlayer
             
             _timerTransparent.Interval = 1000;
             _timerTransparent.Tick += timerTransparent_Tick;
+
+            _timerPreventSleep.Interval = 30000;
+            _timerPreventSleep.Tick += timerPreventSleep_Tick;
+            _timerPreventSleep.Start();
         }
 
         private IntPtr _windowHandle;
+
+        private Timer _timerPreventSleep = new Timer();
 
         private Timer _timerTransparent = new Timer();
         private void setTransparent(bool isTransparent)
@@ -63,6 +70,15 @@ namespace WPFPlayer
                 this.setTransparent(false);
             }
         }
+
+        private void timerPreventSleep_Tick(object sender, EventArgs e)
+        {
+            if(Media.IsPlaying)
+            {
+                Kernel32.SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_AWAYMODE_REQUIRED | EXECUTION_STATE.ES_DISPLAY_REQUIRED);
+            }
+        }
+
         public void Receive(SetTransparentMessage message)
         {
             this.setTransparent(true);
