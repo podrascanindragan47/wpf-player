@@ -700,7 +700,7 @@ namespace WPFPlayer.ViewModels
                 }
                 else
                 {
-                    (App.Current.MainWindow as MainWindow).SetForegroundWindow();
+                    App.Current.MainWindow.Activate();
                 }
                 return;
             }
@@ -713,7 +713,7 @@ namespace WPFPlayer.ViewModels
                 }
                 else
                 {
-                    (App.Current.MainWindow as MainWindow).SetForegroundWindow();
+                    App.Current.MainWindow.Activate();
                 }
                 return;
             }

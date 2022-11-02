@@ -21,5 +21,5 @@ If you find a bug feel free to open an issue. Contributions are also appreciated
   - [.NET Community Toolkit](https://github.com/CommunityToolkit/dotnet)
   - [XamlBehaviors for WPF](https://github.com/Microsoft/XamlBehaviorsWpf)
   - [Wpf.Converters](https://github.com/nkristek/Wpf.Converters)
-  - [WinApi](https://github.com/prasannavl/WinApi)
+  - [P/Invoke](https://github.com/dotnet/pinvoke)
   - [Inno Setup Dependency Installer](https://github.com/DomGries/InnoDependencyInstaller)

@@ -147,7 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autoupdater.NET.Official">
-      <Version>1.7.5</Version>
+      <Version>1.7.6</Version>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm">
       <Version>8.0.0</Version>
@@ -164,8 +164,8 @@
     <PackageReference Include="NKristek.Wpf.Converters">
       <Version>2.0.2</Version>
     </PackageReference>
-    <PackageReference Include="WinApi.Desktop">
-      <Version>4.0.0</Version>
+    <PackageReference Include="PInvoke.User32">
+      <Version>0.7.124</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

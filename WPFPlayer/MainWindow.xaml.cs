@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Interop;
-using WinApi.Windows;
-using NativeWindow = WinApi.Windows.NativeWindow;
-using WinApi.User32;
 using System.Windows.Forms;
 using CommunityToolkit.Mvvm.Messaging;
 using WPFPlayer.Messages;
 using WPFPlayer.ViewModels;
+using PInvoke;
+using static PInvoke.User32;
 
 namespace WPFPlayer
 {
@@ -29,35 +28,34 @@ namespace WPFPlayer
             _timerTransparent.Tick += timerTransparent_Tick;
         }
 
-        private NativeWindow nativeWindow;
+        private IntPtr _windowHandle;
 
         private Timer _timerTransparent = new Timer();
         private void setTransparent(bool isTransparent)
         {
-            var style = nativeWindow.GetExStyles();
-            if(isTransparent)
+            SetWindowLongFlags style = (SetWindowLongFlags)User32.GetWindowLong(_windowHandle, WindowLongIndexFlags.GWL_EXSTYLE);
+            if (isTransparent)
             {
                 Opacity = 0.3;
-                style |= WindowExStyles.WS_EX_TRANSPARENT;
+                style |= SetWindowLongFlags.WS_EX_TRANSPARENT;
                 _timerTransparent.Start();
             }
             else
             {
                 Opacity = 1;
-                style &= ~WindowExStyles.WS_EX_TRANSPARENT;
+                style &= ~SetWindowLongFlags.WS_EX_TRANSPARENT;
                 _timerTransparent.Stop();
             }
-            nativeWindow.SetExStyles(style);
+            User32.SetWindowLong(_windowHandle, WindowLongIndexFlags.GWL_EXSTYLE, style);
         }
         private void timerTransparent_Tick(object sender, EventArgs e)
         {
-            NetCoreEx.Geometry.Point point;
-            User32Methods.GetCursorPos(out point);
-            NetCoreEx.Geometry.Rectangle winRect;
-            User32Methods.GetWindowRect(nativeWindow.Handle, out winRect);
+            POINT point = User32.GetCursorPos();
+            RECT winRect;
+            User32.GetWindowRect(_windowHandle, out winRect);
 
-            if(point.X >= winRect.Left && point.X <= winRect.Right
-                && point.Y >= winRect.Top && point.Y <= winRect.Bottom)
+            if(point.x >= winRect.left && point.x <= winRect.right
+                && point.y >= winRect.top && point.y <= winRect.bottom)
             {
             }
             else
@@ -72,7 +70,7 @@ namespace WPFPlayer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            nativeWindow = WindowFactory.CreateWindowFromHandle(new WindowInteropHelper(this).Handle);
+            _windowHandle = new WindowInteropHelper(this).Handle;
         }
 
         private void Media_MediaOpening(object sender, Unosquare.FFME.Common.MediaOpeningEventArgs e)
@@ -83,11 +81,6 @@ namespace WPFPlayer
         private void Media_MediaClosed(object sender, EventArgs e)
         {
             MainViewModel.Instance.CurrentMediaOptions = null;
-        }
-
-        public void SetForegroundWindow()
-        {
-            User32Methods.SetForegroundWindow(nativeWindow.Handle);
         }
 
         private void TitleBarButton_Click(object sender, RoutedEventArgs e)
