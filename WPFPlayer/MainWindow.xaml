@@ -25,6 +25,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         AllowDrop="True"
         AllowsTransparency="{Binding TransparentOnMouseEnter, Mode=OneTime}"
+        Cursor="{Binding Cursor}"
         DataContext="{x:Static vm:MainViewModel.Instance}"
         Left="{Binding Source={x:Static properties:Settings.Default}, Path=Left, Mode=TwoWay}"
         Loaded="Window_Loaded"

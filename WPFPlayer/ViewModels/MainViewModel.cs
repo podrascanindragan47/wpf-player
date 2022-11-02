@@ -16,6 +16,8 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Unosquare.FFME;
 using Unosquare.FFME.Common;
+using Cursor = System.Windows.Input.Cursor;
+using Cursors = System.Windows.Input.Cursors;
 using DataFormats = System.Windows.DataFormats;
 using DragEventArgs = System.Windows.DragEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -68,6 +70,18 @@ namespace WPFPlayer.ViewModels
 
             _timerHideControls.Interval = 2000;
             _timerHideControls.Tick += timerHideControls_Tick;
+
+            _timerHideCursor.Interval = 2000;
+            _timerHideCursor.Tick += timerHideCursor_Tick;
+        }
+
+        private void timerHideCursor_Tick(object sender, EventArgs e)
+        {
+            if(Media.IsPlaying)
+            {
+                Cursor = Cursors.None;
+            }
+            _timerHideCursor.Stop();
         }
 
         private void timerHideControls_Tick(object sender, EventArgs e)
@@ -80,6 +94,8 @@ namespace WPFPlayer.ViewModels
         }
 
         private Timer _timerHideControls = new Timer();
+
+        private Timer _timerHideCursor = new Timer();
 
         private MediaElement _media = null;
         public MediaElement Media
@@ -524,6 +540,13 @@ namespace WPFPlayer.ViewModels
             }
         }
 
+        private Cursor _cursor;
+        public Cursor Cursor
+        {
+            get => _cursor;
+            set => SetProperty(ref _cursor, value);
+        }
+
         private RelayCommand _openFilesCommand;
         public RelayCommand OpenFilesCommand => _openFilesCommand ?? (_openFilesCommand = new RelayCommand(async () =>
         {
@@ -680,6 +703,8 @@ namespace WPFPlayer.ViewModels
         private RelayCommand<MouseEventArgs> _mouseMoveCommand;
         public RelayCommand<MouseEventArgs> MouseMoveCommand => _mouseMoveCommand ?? (_mouseMoveCommand = new RelayCommand<MouseEventArgs>((e) =>
         {
+            resetCursor();
+
             IsVisibleUIs = true;
             if (IsMinimalInterface)
             {
@@ -691,7 +716,9 @@ namespace WPFPlayer.ViewModels
         private RelayCommand<MouseEventArgs> _mouseEnterCommand;
         public RelayCommand<MouseEventArgs> MouseEnterCommand => _mouseEnterCommand ?? (_mouseEnterCommand = new RelayCommand<MouseEventArgs>(async (e) =>
         {
-            if(Media.MediaState == MediaPlaybackState.Play && MinimizeOnMouseEnter && (DateTime.Now - _minimizeOnMouseEnterTime).TotalSeconds > 2)
+            resetCursor();
+
+            if (Media.MediaState == MediaPlaybackState.Play && MinimizeOnMouseEnter && (DateTime.Now - _minimizeOnMouseEnterTime).TotalSeconds > 2)
             {
                 if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
                 {
@@ -818,6 +845,7 @@ namespace WPFPlayer.ViewModels
 
             await Media.Play();
             updateVideoFilter();
+            _timerHideCursor.Start();
         }
 
         private async Task playNextMedia()
@@ -990,6 +1018,20 @@ namespace WPFPlayer.ViewModels
             {
                 Message = $"Crop: {notification}"
             });
+        }
+
+        private void resetCursor()
+        {
+            if(Cursor == Cursors.None)
+            {
+                Cursor = Cursors.Arrow;
+            }
+
+            _timerHideCursor.Stop();
+            if(Media.IsPlaying)
+            {
+                _timerHideCursor.Start();
+            }
         }
     }
 }
