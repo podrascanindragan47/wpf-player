@@ -415,7 +415,9 @@
                                Margin="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarMarginConverter}}"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Top"
+                               Fill="White"
                                FontSize="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarFontSizeConverter}}"
-                               Foreground="White" />
+                               Stroke="Black"
+                               StrokeThickness="1" />
     </Grid>
 </Window>

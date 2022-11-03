@@ -11,8 +11,8 @@ namespace WPFPlayer.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            double h = (double)value;
-            return Math.Max(h / 16, 12);
+            double h = Math.Max((double)value / 15, 16);
+            return h;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

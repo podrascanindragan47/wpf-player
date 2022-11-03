@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\OutlineTextControl.cs" />
     <Compile Include="Converters\MinimalInterfaceToMediaRowSpanConverter.cs" />
     <Compile Include="Converters\TimeSpanToDoubleConverter.cs" />
     <Compile Include="Converters\TimeSpanToStringConverter.cs" />

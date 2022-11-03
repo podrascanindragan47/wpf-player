@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using System.Windows.Controls;
 using System.Windows.Forms;
+using WPFPlayer.Controls;
 using WPFPlayer.Messages;
 
 namespace WPFPlayer.Views
@@ -8,7 +8,7 @@ namespace WPFPlayer.Views
     /// <summary>
     /// Interaction logic for NotificationBar.xaml
     /// </summary>
-    public partial class NotificationBar : TextBlock,
+    public partial class NotificationBar : OutlinedTextBlock,
         IRecipient<NotificationBarMessage>
     {
         private Timer _timerHideNotification;

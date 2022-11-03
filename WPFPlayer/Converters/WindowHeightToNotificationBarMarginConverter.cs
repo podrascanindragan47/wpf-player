@@ -13,8 +13,8 @@ namespace WPFPlayer.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            double h = (double)value;
-            return new Thickness(0, h / 16, h / 16, 0);
+            double h = Math.Max((double)value / 15, 16);
+            return new Thickness(0, h, h, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
