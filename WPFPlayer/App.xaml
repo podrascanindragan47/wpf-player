@@ -1,6 +1,7 @@
 ﻿<Application x:Class="WPFPlayer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:WPFPlayer.Controls"
              xmlns:local="clr-namespace:WPFPlayer"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              Exit="Application_Exit"
@@ -14,6 +15,8 @@
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
+
+            <Style BasedOn="{StaticResource DefaultMenuItemStyle}" TargetType="controls:DataSelectMenuItem" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

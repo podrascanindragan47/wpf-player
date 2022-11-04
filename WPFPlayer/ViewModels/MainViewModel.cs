@@ -300,7 +300,7 @@ namespace WPFPlayer.ViewModels
             set => SetProperty(ref _currentMediaOptions, value);
         }
 
-        private VideoCropType _videoCrop;
+        private VideoCropType _videoCrop = VideoCropType.Default;
         public VideoCropType VideoCrop
         {
             get => _videoCrop;
@@ -311,174 +311,8 @@ namespace WPFPlayer.ViewModels
                     return;
                 }
 
+                showCropNotification();
                 updateVideoFilter();
-
-                OnPropertyChanged(nameof(IsCropDefault));
-                OnPropertyChanged(nameof(IsCrop16x10));
-                OnPropertyChanged(nameof(IsCrop16x9));
-                OnPropertyChanged(nameof(IsCrop4x3));
-                OnPropertyChanged(nameof(IsCrop1p85x1));
-                OnPropertyChanged(nameof(IsCrop2p21x1));
-                OnPropertyChanged(nameof(IsCrop2p35x1));
-                OnPropertyChanged(nameof(IsCrop2p39x1));
-                OnPropertyChanged(nameof(IsCrop5x3));
-                OnPropertyChanged(nameof(IsCrop5x4));
-                OnPropertyChanged(nameof(IsCrop1x1));
-            }
-        }
-
-        public bool IsCropDefault
-        {
-            get => VideoCrop == VideoCropType.Default;
-            set
-            {
-                if (VideoCrop == VideoCropType.Default)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.Default;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop16x10
-        {
-            get => VideoCrop == VideoCropType.C16x10;
-            set
-            {
-                if (VideoCrop == VideoCropType.C16x10)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C16x10;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop16x9
-        {
-            get => VideoCrop == VideoCropType.C16x9;
-            set
-            {
-                if (VideoCrop == VideoCropType.C16x9)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C16x9;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop4x3
-        {
-            get => VideoCrop == VideoCropType.C4x3;
-            set
-            {
-                if (VideoCrop == VideoCropType.C4x3)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C4x3;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop1p85x1
-        {
-            get => VideoCrop == VideoCropType.C1p85x1;
-            set
-            {
-                if (VideoCrop == VideoCropType.C1p85x1)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C1p85x1;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop2p21x1
-        {
-            get => VideoCrop == VideoCropType.C2p21x1;
-            set
-            {
-                if (VideoCrop == VideoCropType.C2p21x1)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C2p21x1;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop2p35x1
-        {
-            get => VideoCrop == VideoCropType.C2p35x1;
-            set
-            {
-                if (VideoCrop == VideoCropType.C2p35x1)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C2p35x1;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop2p39x1
-        {
-            get => VideoCrop == VideoCropType.C2p39x1;
-            set
-            {
-                if (VideoCrop == VideoCropType.C2p39x1)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C2p39x1;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop5x3
-        {
-            get => VideoCrop == VideoCropType.C5x3;
-            set
-            {
-                if (VideoCrop == VideoCropType.C5x3)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C5x3;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop5x4
-        {
-            get => VideoCrop == VideoCropType.C5x4;
-            set
-            {
-                if (VideoCrop == VideoCropType.C5x4)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C5x4;
-                showCropNotification();
-            }
-        }
-        public bool IsCrop1x1
-        {
-            get => VideoCrop == VideoCropType.C1x1;
-            set
-            {
-                if (VideoCrop == VideoCropType.C1x1)
-                {
-                    return;
-                }
-
-                VideoCrop = VideoCropType.C1x1;
-                showCropNotification();
             }
         }
 
@@ -800,14 +634,13 @@ namespace WPFPlayer.ViewModels
         private RelayCommand _toggleVideoCropCommand;
         public RelayCommand ToggleVideoCropCommand => _toggleVideoCropCommand ?? (_toggleVideoCropCommand = new RelayCommand(() =>
         {
-            if (VideoCrop == VideoCropType.C1x1)
+            int i = VideoCropType.All.IndexOf(VideoCrop) + 1;
+            if(i >= VideoCropType.All.Count)
             {
-                VideoCrop = VideoCropType.Default;
+                i = 0;
             }
-            else
-            {
-                VideoCrop++;
-            }
+
+            VideoCrop = VideoCropType.All[i];
 
             showCropNotification();
         }));
@@ -911,112 +744,15 @@ namespace WPFPlayer.ViewModels
             {
                 return;
             }
-            string videoFilter = getVideoCropFilterString();
+            string videoFilter = VideoCrop.GetVideoFilter(Media.NaturalVideoWidth, Media.NaturalVideoHeight);
             CurrentMediaOptions.VideoFilter = videoFilter;
-        }
-
-        private string getVideoCropFilterString()
-        {
-            if(VideoCrop == VideoCropType.Default)
-            {
-                return string.Empty;
-            }
-
-            float kh = 1, kw = 1;
-            switch(VideoCrop)
-            {
-                case VideoCropType.C16x10:
-                    kw = 16;
-                    kh = 10;
-                    break;
-                case VideoCropType.C16x9:
-                    kw = 16;
-                    kh = 9;
-                    break;
-                case VideoCropType.C4x3:
-                    kw = 4;
-                    kh = 3;
-                    break;
-                case VideoCropType.C1p85x1:
-                    kw = 1.85f;
-                    kh = 1;
-                    break;
-                case VideoCropType.C2p21x1:
-                    kw = 2.21f;
-                    kh = 1;
-                    break;
-                case VideoCropType.C2p35x1:
-                    kw = 2.35f;
-                    kh = 1;
-                    break;
-                case VideoCropType.C2p39x1:
-                    kw = 2.39f;
-                    kh = 1;
-                    break;
-                case VideoCropType.C5x3:
-                    kw = 5;
-                    kh = 3;
-                    break;
-                case VideoCropType.C5x4:
-                    kw = 5;
-                    kh = 4;
-                    break;
-                case VideoCropType.C1x1:
-                    kw = 1;
-                    kh = 1;
-                    break;
-            }
-
-            if(Media.NaturalVideoHeight / kh * kw < Media.NaturalVideoWidth)
-            {
-                return $"crop=in_h*{kw}/{kh}:in_h";
-            }
-            else
-            {
-                return $"crop=in_w:in_w*{kh}/{kw}";
-            }
         }
 
         private void showCropNotification()
         {
-            string notification = "Default";
-            switch (VideoCrop)
-            {
-                case VideoCropType.C16x10:
-                    notification = "16:10";
-                    break;
-                case VideoCropType.C16x9:
-                    notification = "16:9";
-                    break;
-                case VideoCropType.C4x3:
-                    notification = "4:3";
-                    break;
-                case VideoCropType.C1p85x1:
-                    notification = "1.85:1";
-                    break;
-                case VideoCropType.C2p21x1:
-                    notification = "2.21:1";
-                    break;
-                case VideoCropType.C2p35x1:
-                    notification = "2.35:1";
-                    break;
-                case VideoCropType.C2p39x1:
-                    notification = "2.39:1";
-                    break;
-                case VideoCropType.C5x3:
-                    notification = "5:3";
-                    break;
-                case VideoCropType.C5x4:
-                    notification = "5:4";
-                    break;
-                case VideoCropType.C1x1:
-                    notification = "1:1";
-                    break;
-            }
-
             Messenger.Send(new NotificationBarMessage
             {
-                Message = $"Crop: {notification}"
+                Message = $"Crop: {VideoCrop}"
             });
         }
 
