@@ -486,6 +486,18 @@ namespace WPFPlayer.ViewModels
         private RelayCommand<MediaStateChangedEventArgs> _mediaStateChangedCommand;
         public RelayCommand<MediaStateChangedEventArgs> MediaStateChangedCommand => _mediaStateChangedCommand ?? (_mediaStateChangedCommand = new RelayCommand<MediaStateChangedEventArgs>((e) =>
         {
+            if (e.MediaState == MediaPlaybackState.Stop && e.OldMediaState == MediaPlaybackState.Play)
+            {
+                if(Media.IsNetworkStream && Media.IsSeekable && (TotalTime - Media.Position).TotalSeconds >= 3)
+                {
+                    var currentPosition = Media.Position;
+                    App.Current.Dispatcher.Invoke(async () =>
+                    {
+                        await startMedia(currentPosition);
+                    });
+                }
+            }
+
             OnPropertyChanged(nameof(PlayPauseIcon));
             OnPropertyChanged(nameof(PlayPauseLabel));
             StopCommand.NotifyCanExecuteChanged();
@@ -670,14 +682,17 @@ namespace WPFPlayer.ViewModels
             IsMinimalInterface = !IsMinimalInterface;
         }));
 
-        private async Task startMedia()
+        private async Task startMedia(TimeSpan? startPostion = null)
         {
             await Media.Open(Playlist.Medias[CurrentPlayIndex].Uri);
 
             TotalTime = Media.NaturalDuration ?? TimeSpan.Zero;
-
             await Media.Play();
             updateVideoFilter();
+            if (startPostion.HasValue)
+            {
+                Media.Position = startPostion.Value;
+            }
             _timerHideCursor.Start();
         }
 
@@ -717,8 +732,7 @@ namespace WPFPlayer.ViewModels
 
             if (isPlaying)
             {
-                await startMedia();
-                Media.Position = oldPosition;
+                await startMedia(oldPosition);
             }
         }
 
