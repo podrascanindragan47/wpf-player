@@ -381,6 +381,13 @@ namespace WPFPlayer.ViewModels
             set => SetProperty(ref _cursor, value);
         }
 
+        private bool _isLoading = false;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set => SetProperty(ref _isLoading, value);
+        }
+
         private RelayCommand _openFilesCommand;
         public RelayCommand OpenFilesCommand => _openFilesCommand ?? (_openFilesCommand = new RelayCommand(async () =>
         {
@@ -684,6 +691,8 @@ namespace WPFPlayer.ViewModels
 
         private async Task startMedia(TimeSpan? startPostion = null)
         {
+            IsLoading = true;
+
             await Media.Open(Playlist.Medias[CurrentPlayIndex].Uri);
 
             TotalTime = Media.NaturalDuration ?? TimeSpan.Zero;
@@ -693,6 +702,9 @@ namespace WPFPlayer.ViewModels
             {
                 Media.Position = startPostion.Value;
             }
+
+            IsLoading = false;
+
             _timerHideCursor.Start();
         }
 

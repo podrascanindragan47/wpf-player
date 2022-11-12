@@ -298,22 +298,49 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ffme:MediaElement x:Name="Media"
-                           Grid.Row="0"
-                           Grid.RowSpan="{Binding IsMinimalInterface, Converter={converters:MinimalInterfaceToMediaRowSpanConverter}}"
-                           IsMuted="{Binding IsMuted, Mode=TwoWay}"
-                           LoadedBehavior="Play"
-                           MediaClosed="Media_MediaClosed"
-                           MediaOpening="Media_MediaOpening"
-                           Position="{Binding SeekTime}"
-                           UnloadedBehavior="Manual"
-                           Volume="{Binding Volume, Mode=TwoWay}">
-            <behaviors:Interaction.Triggers>
-                <behaviors:EventTrigger EventName="MediaStateChanged" SourceObject="{Binding ElementName=Media}">
-                    <behaviors:InvokeCommandAction Command="{Binding MediaStateChangedCommand}" PassEventArgsToCommand="True" />
-                </behaviors:EventTrigger>
-            </behaviors:Interaction.Triggers>
-        </ffme:MediaElement>
+        <Grid Grid.Row="0" Grid.RowSpan="{Binding IsMinimalInterface, Converter={converters:MinimalInterfaceToMediaRowSpanConverter}}">
+            <ffme:MediaElement x:Name="Media"
+                               IsMuted="{Binding IsMuted, Mode=TwoWay}"
+                               LoadedBehavior="Play"
+                               MediaClosed="Media_MediaClosed"
+                               MediaOpening="Media_MediaOpening"
+                               Position="{Binding SeekTime}"
+                               UnloadedBehavior="Manual"
+                               Volume="{Binding Volume, Mode=TwoWay}">
+                <behaviors:Interaction.Triggers>
+                    <behaviors:EventTrigger EventName="MediaStateChanged" SourceObject="{Binding ElementName=Media}">
+                        <behaviors:InvokeCommandAction Command="{Binding MediaStateChangedCommand}" PassEventArgsToCommand="True" />
+                    </behaviors:EventTrigger>
+                </behaviors:Interaction.Triggers>
+            </ffme:MediaElement>
+
+            <views:NotificationBar Margin="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarMarginConverter}}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Top"
+                                   Fill="White"
+                                   FontSize="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarFontSizeConverter}}"
+                                   Stroke="Black"
+                                   StrokeThickness="1" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <ui:ProgressRing Grid.Row="1"
+                                 Grid.Column="1"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch"
+                                 IsActive="{Binding IsLoading}" />
+            </Grid>
+        </Grid>
+
         <Grid Grid.Row="1"
               Background="{DynamicResource SystemControlBackgroundAltMediumLowBrush}"
               Visibility="{Binding IsVisibleUIs, Converter={conv:BoolToVisibilityConverter}}">
@@ -390,14 +417,5 @@
                 </ui:CommandBar>
             </Grid>
         </Grid>
-
-        <views:NotificationBar Grid.Row="0"
-                               Margin="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarMarginConverter}}"
-                               HorizontalAlignment="Right"
-                               VerticalAlignment="Top"
-                               Fill="White"
-                               FontSize="{Binding ActualHeight, ElementName=Media, Converter={converters:WindowHeightToNotificationBarFontSizeConverter}}"
-                               Stroke="Black"
-                               StrokeThickness="1" />
     </Grid>
 </Window>
