@@ -45,6 +45,10 @@ Source: "WPFPlayer\bin\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignore
 Source: "WPFPlayer\bin\Release\ffmpeg\*"; DestDir: "{app}\ffmpeg"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "WPFPlayer\bin\Release\AutoUpdater.NET.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\CommunityToolkit.Mvvm.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\concrt140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\cvextern.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\Emgu.CV.Bitmap.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\Emgu.CV.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\ffme.win.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\FFmpeg.AutoGen.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -54,19 +58,28 @@ Source: "WPFPlayer\bin\Release\Microsoft.Web.WebView2.Wpf.dll"; DestDir: "{app}"
 Source: "WPFPlayer\bin\Release\Microsoft.Xaml.Behaviors.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\ModernWpf.Controls.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\ModernWpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\msvcp140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\msvcp140_2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\msvcp140_atomic_wait.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\msvcp140_codecvt_ids.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\NKristek.Wpf.Converters.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\opencv_videoio_ffmpeg460_64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\PInvoke.Kernel32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\PInvoke.User32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\PInvoke.Windows.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\PInvoke.Windows.ShellScalingApi.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.Buffers.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.ComponentModel.Annotations.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\System.Drawing.Common.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.Memory.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.Numerics.Vectors.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.Runtime.CompilerServices.Unsafe.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.Threading.Tasks.Extensions.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\System.ValueTuple.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\Validation.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WPFPlayer\bin\Release\vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WPFPlayer\bin\Release\WPFPlayer.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Linq;
 
 namespace WPFPlayer.Helpers
@@ -173,6 +174,7 @@ namespace WPFPlayer.Helpers
             }
         }
 
+        public static readonly Random RANDOM = new Random();
 
         public static string getOpenFileFilter()
         {

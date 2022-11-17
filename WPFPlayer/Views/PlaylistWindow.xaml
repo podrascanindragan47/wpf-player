@@ -1,0 +1,128 @@
+﻿<Window x:Class="WPFPlayer.Views.PlaylistWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:WPFPlayer.Views"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:vm="clr-namespace:WPFPlayer.ViewModels"
+        Title="Playlist"
+        Width="{Binding Width, Mode=TwoWay}"
+        Height="{Binding Height, Mode=TwoWay}"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Closed="Window_Closed"
+        DataContext="{x:Static vm:PlaylistViewModel.Instance}"
+        Left="{Binding Left, Mode=TwoWay}"
+        Top="{Binding Top, Mode=TwoWay}"
+        mc:Ignorable="d">
+    <behaviors:Interaction.Triggers>
+        <behaviors:EventTrigger EventName="LocationChanged">
+            <behaviors:InvokeCommandAction Command="{Binding WindowLocationChangedCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+        <behaviors:EventTrigger EventName="SizeChanged">
+            <behaviors:InvokeCommandAction Command="{Binding WindowSizeChangedCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+    </behaviors:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ui:CommandBar Grid.Row="0" DefaultLabelPosition="Collapsed">
+            <ui:AppBarButton Click="btnAdd_Click"
+                             Icon="Add"
+                             Label="Add">
+                <ui:AppBarButton.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Command="{Binding OpenFilesCommand}"
+                                  DataContext="{x:Static vm:MainViewModel.Instance}"
+                                  Header="Open File(s)..."
+                                  InputGestureText="Ctrl+O">
+                            <MenuItem.Icon>
+                                <ui:FontIcon Glyph="&#xE8E5;" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="{Binding OpenURLCommand}"
+                                  DataContext="{x:Static vm:MainViewModel.Instance}"
+                                  Header="Open URL..."
+                                  InputGestureText="Ctrl+U">
+                            <MenuItem.Icon>
+                                <ui:FontIcon Glyph="&#xE774;" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="{Binding OpenFolderCommand}"
+                                  DataContext="{x:Static vm:MainViewModel.Instance}"
+                                  Header="Open Folder..."
+                                  InputGestureText="Ctrl+F">
+                            <MenuItem.Icon>
+                                <ui:FontIcon Glyph="&#xE838;" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </ui:AppBarButton.ContextMenu>
+            </ui:AppBarButton>
+            <ui:AppBarButton Command="{Binding RemoveItemsCommand}"
+                             Icon="Remove"
+                             Label="Remove" />
+            <ui:AppBarButton Icon="Sort" Label="Sort" />
+            <ui:AppBarSeparator />
+            <ui:AppBarButton Command="{Binding MoveUpCommand}" Label="Move up">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE70E;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+            <ui:AppBarButton Command="{Binding MoveDownCommand}" Label="Move down">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE70D;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+        </ui:CommandBar>
+
+        <ListView x:Name="grid"
+                  Grid.Row="1"
+                  ItemsSource="{Binding Items}">
+            <ListView.ItemContainerStyle>
+                <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="{x:Type ListViewItem}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,5,0,5">
+                        <Grid.InputBindings>
+                            <MouseBinding Command="{Binding DoubleClickCommand}" Gesture="LeftDoubleClick" />
+                        </Grid.InputBindings>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image Grid.Column="0"
+                               Width="64"
+                               Height="36"
+                               Margin="0,0,10,0"
+                               Source="{Binding Thumbnail}"
+                               Stretch="UniformToFill" />
+
+                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                       FontWeight="{Binding TextFontWeight}"
+                                       Text="{Binding Title}" />
+                            <TextBlock Grid.Row="1"
+                                       FontWeight="{Binding TextFontWeight}"
+                                       Text="{Binding Duration}" />
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+
+</Window>

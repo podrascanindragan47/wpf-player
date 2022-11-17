@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using WPFPlayer.Helpers;
 using WPFPlayer.Messages;
-using WPFPlayer.Models;
 using WPFPlayer.Properties;
 using WPFPlayer.Views;
 using ModernWpf.Controls;
@@ -24,11 +23,18 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using AutoUpdaterDotNET;
 using System.Diagnostics;
 using ModernWpf;
+using System.Collections.Generic;
 
 namespace WPFPlayer.ViewModels
 {
-    public class MainViewModel : ObservableRecipient
+    public class MainViewModel : ObservableRecipient,
+        IRecipient<PlayItemMessage>
     {
+        public MainViewModel()
+        {
+            IsActive = true;
+        }
+
         private static MainViewModel _instance;
         public static MainViewModel Instance
         {
@@ -48,24 +54,14 @@ namespace WPFPlayer.ViewModels
             if (args.Length > 1 && File.Exists(args[1]))
             {
                 string directory = Path.GetDirectoryName(args[1]);
-                string[] files = Directory.GetFiles(directory)
+                List<string> files = Directory.GetFiles(directory)
                     .Where(x => Constants.MediaFileExtensions.Any(y => x.EndsWith("." + y, StringComparison.OrdinalIgnoreCase)))
-                    .ToArray();
-                for (int i = 0; i < files.Length; i++)
-                {
-                    Playlist.Medias.Add(new FileMedia
-                    {
-                        Path = files[i]
-                    });
+                    .ToList();
 
-                    if (files[i] == args[1])
-                    {
-                        CurrentPlayIndex = i;
-                    }
-                }
+                PlaylistViewModel.Instance.AddFiles(new List<string> { args[1] }, true);
+                PlaylistViewModel.Instance.AddFiles(files);
 
                 await startMedia();
-                PlayPauseCommand.NotifyCanExecuteChanged();
             }
 
             _timerHideControls.Interval = 2000;
@@ -73,6 +69,8 @@ namespace WPFPlayer.ViewModels
 
             _timerHideCursor.Interval = 2000;
             _timerHideCursor.Tick += timerHideCursor_Tick;
+
+            PlayPauseCommand.NotifyCanExecuteChanged();
         }
 
         private void timerHideCursor_Tick(object sender, EventArgs e)
@@ -109,26 +107,6 @@ namespace WPFPlayer.ViewModels
                 {
                     initialize();
                 }
-            }
-        }
-
-        private Playlist _playlist = new Playlist();
-        public Playlist Playlist
-        {
-            get => _playlist;
-            set => SetProperty(ref _playlist, value);
-        }
-
-        private int _currentPlayIndex = 0;
-        public int CurrentPlayIndex
-        {
-            get => _currentPlayIndex;
-            set
-            {
-                SetProperty(ref _currentPlayIndex, value);
-
-                NextMediaCommand.NotifyCanExecuteChanged();
-                PreviousMediaCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -196,6 +174,36 @@ namespace WPFPlayer.ViewModels
             set => SetProperty(ref _isVisibleUIs, value);
         }
 
+        public double Left
+        {
+            get => Settings.Default.Left;
+            set
+            {
+                if(Settings.Default.Left == value)
+                {
+                    return;
+                }
+
+                Settings.Default.Left = value;
+
+                OnPropertyChanged(nameof(Left));
+            }
+        }
+        public double Top
+        {
+            get => Settings.Default.Top;
+            set
+            {
+                if(Settings.Default.Top == value)
+                {
+                    return;
+                }
+
+                Settings.Default.Top = value;
+
+                OnPropertyChanged(nameof(Top));
+            }
+        }
         public double Width
         {
             get => Settings.Default.Width;
@@ -220,6 +228,7 @@ namespace WPFPlayer.ViewModels
                 OnPropertyChanged(nameof(Height));
             }
         }
+        public double Right => Left + Width;
         public WindowState WindowState
         {
             get => Settings.Default.WindowState;
@@ -316,8 +325,8 @@ namespace WPFPlayer.ViewModels
             }
         }
 
-        public IconElement PlayPauseIcon => Media.MediaState != MediaPlaybackState.Play ? new SymbolIcon((Symbol)0xF5B0) : new SymbolIcon((Symbol)0xF8AE);
-        public string PlayPauseLabel => Media.MediaState != MediaPlaybackState.Play ? "Play" : "Pause";
+        public IconElement PlayPauseIcon => IsPlaying ? new SymbolIcon((Symbol)0xF8AE) : new SymbolIcon((Symbol)0xF5B0);
+        public string PlayPauseLabel => IsPlaying ? "Pause" : "Play";
 
         public bool IsMinimalInterface
         {
@@ -388,6 +397,93 @@ namespace WPFPlayer.ViewModels
             set => SetProperty(ref _isLoading, value);
         }
 
+        private bool _isRandom = false;
+        public bool IsRandom
+        {
+            get => _isRandom;
+            set
+            {
+                if(!SetProperty(ref _isRandom, value))
+                {
+                    return;
+                }
+
+                NextMediaCommand.NotifyCanExecuteChanged();
+                PreviousMediaCommand.NotifyCanExecuteChanged();
+
+                Messenger.Send(new NotificationBarMessage
+                {
+                    Message = "Random: " + (value ? "On" : "Off")
+                });
+            }
+        }
+
+        private RepeatType _repeatType;
+        public RepeatType RepeatType
+        {
+            get => _repeatType;
+            set
+            {
+                if(!SetProperty(ref _repeatType, value))
+                {
+                    return;
+                }
+
+                NextMediaCommand.NotifyCanExecuteChanged();
+                PreviousMediaCommand.NotifyCanExecuteChanged();
+
+                Messenger.Send(new NotificationBarMessage
+                {
+                    Message = $"Loop: {value}"
+                });
+            }
+        }
+
+        private bool _isPlaying = false;
+        public bool IsPlaying
+        {
+            get => _isPlaying;
+            set
+            {
+                if(!SetProperty(ref _isPlaying, value))
+                {
+                    return;
+                }
+
+                OnPropertyChanged(nameof(PlayPauseIcon));
+                OnPropertyChanged(nameof(PlayPauseLabel));
+            } 
+        }
+
+        public bool ShowPlaylistWindow
+        {
+            get => PlaylistWindow.Instance != null;
+            set
+            {
+                if(ShowPlaylistWindow == value)
+                {
+                    return;
+                }
+                if(value)
+                {
+                    PlaylistWindow.Instance = new PlaylistWindow();
+                    PlaylistWindow.Instance.Show();
+                    PlaylistViewModel.Instance.IsDocked = true;
+                    PlaylistViewModel.Instance.DockTopDelta = 0;
+                    PlaylistViewModel.Instance.DockBottomDelta = 0;
+                    UpdatePlaylistWindowPosition();
+                }
+                else
+                {
+                    PlaylistWindow.Instance.Close();
+                }
+            }
+        }
+        public void UpdateShowPlaylistWindow()
+        {
+            OnPropertyChanged(nameof(ShowPlaylistWindow));
+        }
+
         private RelayCommand _openFilesCommand;
         public RelayCommand OpenFilesCommand => _openFilesCommand ?? (_openFilesCommand = new RelayCommand(async () =>
         {
@@ -399,15 +495,7 @@ namespace WPFPlayer.ViewModels
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    int i = Playlist.Medias.Count;
-
-                    Playlist.Medias.AddRange(dlg.FileNames.Select(x => new FileMedia
-                    {
-                        Path = x
-                    }));
-
-                    CurrentPlayIndex = i;
-
+                    PlaylistViewModel.Instance.AddFiles(dlg.FileNames.ToList(), true);
                     await startMedia();
 
                     PlayPauseCommand.NotifyCanExecuteChanged();
@@ -421,12 +509,7 @@ namespace WPFPlayer.ViewModels
             OpenUrlWindow dlg = new OpenUrlWindow();
             if(dlg.ShowDialog().Value)
             {
-                Playlist.Medias.Add(new UrlMedia
-                {
-                    URL = dlg.URL,
-                });
-                CurrentPlayIndex = Playlist.Medias.Count - 1;
-
+                PlaylistViewModel.Instance.AddFiles(new List<string> { dlg.URL }, true);
                 await startMedia();
 
                 PlayPauseCommand.NotifyCanExecuteChanged();
@@ -441,15 +524,13 @@ namespace WPFPlayer.ViewModels
                 dlg.ShowNewFolderButton = false;
                 if(dlg.ShowDialog() == DialogResult.OK)
                 {
-                    string[] files = Directory.GetFiles(dlg.SelectedPath)
+                    List<string> files = Directory.GetFiles(dlg.SelectedPath)
                         .Where(x => Constants.MediaFileExtensions.Any(y => x.EndsWith("." + y, StringComparison.OrdinalIgnoreCase)))
-                        .ToArray();
-                    Playlist.Medias.AddRange(files.Select(x => new FileMedia
-                    {
-                        Path = x
-                    }));
-                    CurrentPlayIndex = Playlist.Medias.Count - files.Length;
+                        .ToList();
+
+                    PlaylistViewModel.Instance.AddFiles(files, true);
                     await startMedia();
+
                     PlayPauseCommand.NotifyCanExecuteChanged();
                 }
             }
@@ -459,54 +540,90 @@ namespace WPFPlayer.ViewModels
         public RelayCommand NextMediaCommand => _nextMediaCommand ?? (_nextMediaCommand = new RelayCommand(
             async () =>
             {
-                await playNextMedia();
+                IsPlaying = true;
+                PlaylistViewModel.Instance.CurrentItem = PlaylistViewModel.Instance.GetNextMedia();
+                await startMedia();
             },
-            () => Playlist.Medias.Count > 0 && CurrentPlayIndex < Playlist.Medias.Count - 1));
+            () => PlaylistViewModel.Instance.GetNextMedia() != null ));
 
         private RelayCommand _previousMediaCommand;
         public RelayCommand PreviousMediaCommand => _previousMediaCommand ?? (_previousMediaCommand = new RelayCommand(
             async () =>
             {
-                await playPreviousMedia();
+                IsPlaying = true;
+                PlaylistViewModel.Instance.CurrentItem = PlaylistViewModel.Instance.GetPrevMedia();
+                await startMedia();
             },
-            () => Playlist.Medias.Count > 0 && CurrentPlayIndex > 0));
+            () => PlaylistViewModel.Instance.GetPrevMedia() != null ));
 
         private RelayCommand _playPauseCommand;
         public RelayCommand PlayPauseCommand => _playPauseCommand ?? (_playPauseCommand = new RelayCommand(
             async () =>
             {
-                switch (Media.MediaState)
+                IsPlaying = !IsPlaying;
+                if(IsPlaying)
                 {
-                    case MediaPlaybackState.Play:
-                        await Media.Pause();
-                        break;
-                    case MediaPlaybackState.Close:
-                        await startMedia();
-                        break;
-                    default:
-                        await Media.Play();
-                        break;
+                    switch (Media.MediaState)
+                    {
+                        case MediaPlaybackState.Close:
+                            await startMedia();
+                            break;
+                        default:
+                            await Media.Play();
+                            break;
+                    }
                 }
+                else
+                {
+                    await Media.Pause();
+                }    
             },
-            () => Playlist.Medias.Count > 0));
+            () => PlaylistViewModel.Instance.Items.Any() ));
 
         private RelayCommand<MediaStateChangedEventArgs> _mediaStateChangedCommand;
         public RelayCommand<MediaStateChangedEventArgs> MediaStateChangedCommand => _mediaStateChangedCommand ?? (_mediaStateChangedCommand = new RelayCommand<MediaStateChangedEventArgs>((e) =>
         {
             if (e.MediaState == MediaPlaybackState.Stop && e.OldMediaState == MediaPlaybackState.Play)
             {
-                if(Media.IsNetworkStream && Media.IsSeekable && (TotalTime - Media.Position).TotalSeconds >= 3)
+                if(IsPlaying)
                 {
-                    var currentPosition = Media.Position;
-                    App.Current.Dispatcher.Invoke(async () =>
+                    if (Media.IsNetworkStream && Media.IsSeekable && (TotalTime - Media.Position).TotalSeconds >= 3)
                     {
-                        await startMedia(currentPosition);
-                    });
+                        var currentPosition = Media.Position;
+                        App.Current.Dispatcher.Invoke(async () =>
+                        {
+                            await startMedia(currentPosition);
+                        });
+                        return;
+                    }
+
+                    if(Media.Position.TotalSeconds < 0.5)
+                    {
+                        var nextItem = PlaylistViewModel.Instance.GetNextMedia();
+                        if (nextItem != null)
+                        {
+                            PlaylistViewModel.Instance.CurrentItem = nextItem;
+                            App.Current.Dispatcher.Invoke(async () =>
+                            {
+                                await startMedia();
+                            });
+                            return;
+                        }
+                        else
+                        {
+                            IsPlaying = false;
+                        }
+                    }
+                    else
+                    {
+                        App.Current.Dispatcher.Invoke(async () =>
+                        {
+                            await Media.Play();
+                        });
+                    }
                 }
             }
 
-            OnPropertyChanged(nameof(PlayPauseIcon));
-            OnPropertyChanged(nameof(PlayPauseLabel));
             StopCommand.NotifyCanExecuteChanged();
         }));
 
@@ -514,8 +631,10 @@ namespace WPFPlayer.ViewModels
         public RelayCommand StopCommand => _stopCommand ?? (_stopCommand = new RelayCommand(
             async () =>
             {
+                IsPlaying = false;
                 await Media.Close();
-                CurrentPlayIndex = 0;
+
+                PlaylistViewModel.Instance.CurrentItem = PlaylistViewModel.Instance.Items[0];
             },
             () => Media.IsPlaying || Media.IsPaused));
 
@@ -617,14 +736,11 @@ namespace WPFPlayer.ViewModels
             if(e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                Playlist.Medias.AddRange(files.Select(x => new FileMedia
-                {
-                    Path = x
-                }));
-                CurrentPlayIndex = Playlist.Medias.Count - files.Length;
+                PlaylistViewModel.Instance.AddFiles(files.ToList(), true);
                 await startMedia();
 
                 PlayPauseCommand.NotifyCanExecuteChanged();
+
                 return;
             }
         }));
@@ -689,35 +805,69 @@ namespace WPFPlayer.ViewModels
             IsMinimalInterface = !IsMinimalInterface;
         }));
 
+        private RelayCommand _toggleRepeatCommand;
+        public RelayCommand ToggleRepeatCommand => _toggleRepeatCommand ?? (_toggleRepeatCommand = new RelayCommand(() =>
+        {
+            if(RepeatType == RepeatType.One)
+            {
+                RepeatType = RepeatType.Off;
+            }
+            else
+            {
+                RepeatType++;
+            }
+        }));
+
+        private RelayCommand _toggleRandomCommand;
+        public RelayCommand ToggleRandomCommand => _toggleRandomCommand ?? (_toggleRandomCommand = new RelayCommand(() =>
+        {
+            IsRandom = !IsRandom;
+        }));
+
+        private RelayCommand<EventArgs> _windowLocationChangedCommand;
+        public RelayCommand<EventArgs> WindowLocationChangedCommand => _windowLocationChangedCommand ?? (_windowLocationChangedCommand = new RelayCommand<EventArgs>((e) =>
+        {
+            UpdatePlaylistWindowPosition();
+        }));
+        private RelayCommand<SizeChangedEventArgs> _windowSizeChangedCommand;
+        public RelayCommand<SizeChangedEventArgs> WindowSizeChangedCommand => _windowSizeChangedCommand ?? (_windowSizeChangedCommand = new RelayCommand<SizeChangedEventArgs>((e) =>
+        {
+            UpdatePlaylistWindowPosition();
+        }));
+
+        private RelayCommand _togglePlaylistCommand;
+        public RelayCommand TogglePlaylistCommand => _togglePlaylistCommand ?? (_togglePlaylistCommand = new RelayCommand(() =>
+        {
+            ShowPlaylistWindow = !ShowPlaylistWindow;
+        }));
+
+        public void UpdatePlaylistWindowPosition()
+        {
+            if (PlaylistViewModel.Instance != null && PlaylistViewModel.Instance.IsDocked && WindowState == WindowState.Normal)
+            {
+                PlaylistViewModel.Instance.IsMovingFromHost = true;
+
+                PlaylistViewModel.Instance.Left = Right;
+                PlaylistViewModel.Instance.Top = Top + PlaylistViewModel.Instance.DockTopDelta;
+                PlaylistViewModel.Instance.Height = Top + Height - PlaylistViewModel.Instance.Top + PlaylistViewModel.Instance.DockBottomDelta;
+                PlaylistViewModel.Instance.IsMovingFromHost = false;
+            }
+        }
+
         private async Task startMedia(TimeSpan? startPostion = null)
         {
             IsLoading = true;
+            IsPlaying = true;
 
-            await Media.Open(Playlist.Medias[CurrentPlayIndex].Uri);
-
+            await Media.Open(PlaylistViewModel.Instance.CurrentItem.Data.MediaSource);
+            Media.Position = startPostion ?? TimeSpan.Zero;
             TotalTime = Media.NaturalDuration ?? TimeSpan.Zero;
-            await Media.Play();
             updateVideoFilter();
-            if (startPostion.HasValue)
-            {
-                Media.Position = startPostion.Value;
-            }
+            await Media.Play();
 
             IsLoading = false;
 
             _timerHideCursor.Start();
-        }
-
-        private async Task playNextMedia()
-        {
-            CurrentPlayIndex++;
-            await startMedia();
-        }
-
-        private async Task playPreviousMedia()
-        {
-            CurrentPlayIndex--;
-            await startMedia();
         }
 
         private void jumpSeconds(int seconds)
@@ -728,11 +878,9 @@ namespace WPFPlayer.ViewModels
 
         private async void recreateMainWindow()
         {
-            bool isPlaying = false;
             TimeSpan oldPosition = TimeSpan.Zero;
-            if (Media.MediaState == MediaPlaybackState.Play)
+            if (IsPlaying)
             {
-                isPlaying = true;
                 oldPosition = Media.Position;
                 await Media.Close();
             }
@@ -742,7 +890,7 @@ namespace WPFPlayer.ViewModels
             App.Current.MainWindow.Show();
             oldWindow.Close();
 
-            if (isPlaying)
+            if (IsPlaying)
             {
                 await startMedia(oldPosition);
             }
@@ -764,7 +912,7 @@ namespace WPFPlayer.ViewModels
             });
         }
 
-        private void updateVideoFilter()
+        public void updateVideoFilter()
         {
             if(!Media.IsOpen)
             {
@@ -794,6 +942,13 @@ namespace WPFPlayer.ViewModels
             {
                 _timerHideCursor.Start();
             }
+        }
+
+        public async void Receive(PlayItemMessage message)
+        {
+            IsPlaying = true;
+            PlaylistViewModel.Instance.CurrentItem = message.Item;
+            await startMedia();
         }
     }
 }

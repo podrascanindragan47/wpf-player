@@ -12,7 +12,7 @@ namespace WPFPlayer.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -164,6 +164,90 @@ namespace WPFPlayer.Properties {
             }
             set {
                 this["Theme"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PlaylistWindowDocked {
+            get {
+                return ((bool)(this["PlaylistWindowDocked"]));
+            }
+            set {
+                this["PlaylistWindowDocked"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("400")]
+        public double PlaylistWindowWidth {
+            get {
+                return ((double)(this["PlaylistWindowWidth"]));
+            }
+            set {
+                this["PlaylistWindowWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public double PlaylistWindowHeight {
+            get {
+                return ((double)(this["PlaylistWindowHeight"]));
+            }
+            set {
+                this["PlaylistWindowHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double PlaylistWindowLeft {
+            get {
+                return ((double)(this["PlaylistWindowLeft"]));
+            }
+            set {
+                this["PlaylistWindowLeft"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double PlaylistWindowTop {
+            get {
+                return ((double)(this["PlaylistWindowTop"]));
+            }
+            set {
+                this["PlaylistWindowTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double PlaylistWindowDockTopDelta {
+            get {
+                return ((double)(this["PlaylistWindowDockTopDelta"]));
+            }
+            set {
+                this["PlaylistWindowDockTopDelta"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double PlaylistWindowDockBottomDelta {
+            get {
+                return ((double)(this["PlaylistWindowDockBottomDelta"]));
+            }
+            set {
+                this["PlaylistWindowDockBottomDelta"] = value;
             }
         }
     }

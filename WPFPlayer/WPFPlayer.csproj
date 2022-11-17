@@ -65,21 +65,23 @@
     <Compile Include="Controls\DataSelectMenuItem.cs" />
     <Compile Include="Controls\OutlineTextControl.cs" />
     <Compile Include="Converters\MinimalInterfaceToMediaRowSpanConverter.cs" />
+    <Compile Include="Converters\RepeatTypeToIconConverter.cs" />
     <Compile Include="Converters\TimeSpanToDoubleConverter.cs" />
     <Compile Include="Converters\TimeSpanToStringConverter.cs" />
     <Compile Include="Converters\VolumeToStringConverter.cs" />
     <Compile Include="Converters\WindowHeightToNotificationBarFontSizeConverter.cs" />
     <Compile Include="Converters\WindowHeightToNotificationBarMarginConverter.cs" />
     <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Helpers\RepeatType.cs" />
     <Compile Include="Helpers\VideoCropType.cs" />
     <Compile Include="Messages\NotificationBarMessage.cs" />
+    <Compile Include="Messages\PlayItemMessage.cs" />
     <Compile Include="Messages\SetTransparentMessage.cs" />
-    <Compile Include="Models\FileMedia.cs" />
-    <Compile Include="Models\MediaData.cs" />
-    <Compile Include="Models\Playlist.cs" />
-    <Compile Include="Models\UrlMedia.cs" />
+    <Compile Include="Models\PlaylistItem.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\PlaylistItemViewModel.cs" />
+    <Compile Include="ViewModels\PlaylistViewModel.cs" />
     <Compile Include="Views\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
@@ -91,6 +93,9 @@
     </Compile>
     <Compile Include="Views\OpenUrlWindow.xaml.cs">
       <DependentUpon>OpenUrlWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PlaylistWindow.xaml.cs">
+      <DependentUpon>PlaylistWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -117,6 +122,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\OpenUrlWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PlaylistWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -154,6 +163,12 @@
     <PackageReference Include="CommunityToolkit.Mvvm">
       <Version>8.0.0</Version>
     </PackageReference>
+    <PackageReference Include="Emgu.CV.Bitmap">
+      <Version>4.6.0.5131</Version>
+    </PackageReference>
+    <PackageReference Include="Emgu.CV.runtime.windows">
+      <Version>4.6.0.5131</Version>
+    </PackageReference>
     <PackageReference Include="FFME.Windows">
       <Version>4.4.350</Version>
     </PackageReference>
@@ -173,6 +188,7 @@
   <ItemGroup>
     <Resource Include="app.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell.exe -NoProfile -ExecutionPolicy unrestricted -file $(ProjectDir)download_ffmpeg.ps1 -ProjectDir $(ProjectDir) -OutputDir $(TargetDir)</PostBuildEvent>

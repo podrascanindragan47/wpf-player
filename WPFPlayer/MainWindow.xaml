@@ -29,9 +29,9 @@
         AllowsTransparency="{Binding TransparentOnMouseEnter, Mode=OneTime}"
         Cursor="{Binding Cursor}"
         DataContext="{x:Static vm:MainViewModel.Instance}"
-        Left="{Binding Source={x:Static properties:Settings.Default}, Path=Left, Mode=TwoWay}"
+        Left="{Binding Left, Mode=TwoWay}"
         Loaded="Window_Loaded"
-        Top="{Binding Source={x:Static properties:Settings.Default}, Path=Top, Mode=TwoWay}"
+        Top="{Binding Top, Mode=TwoWay}"
         Topmost="{Binding Source={x:Static properties:Settings.Default}, Path=TopMost, Mode=TwoWay}"
         WindowState="{Binding WindowState, Mode=TwoWay}"
         WindowStyle="None"
@@ -148,11 +148,30 @@
                         <ui:FontIcon Glyph="&#xE893;" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <Separator />
+                <MenuItem Command="{Binding ToggleRepeatCommand}"
+                          Header="Toggle Loop Mode"
+                          Icon="{Binding RepeatType, Converter={converters:RepeatTypeToIconConverter}, UpdateSourceTrigger=PropertyChanged}"
+                          InputGestureText="L" />
+                <MenuItem Command="{Binding ToggleRandomCommand}"
+                          Header="Shuffle"
+                          InputGestureText="R">
+                    <MenuItem.Icon>
+                        <ui:FontIcon Glyph="&#xE8B1;" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
 
             <Separator />
 
             <MenuItem Header="View">
+                <MenuItem Header="Playlist"
+                          InputGestureText="Ctrl+L"
+                          IsCheckable="True"
+                          IsChecked="{Binding ShowPlaylistWindow}" />
+
+                <Separator />
+
                 <MenuItem Header="Always on top"
                           IsCheckable="True"
                           IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=TopMost}" />
@@ -245,7 +264,14 @@
         <KeyBinding Key="P" Command="{Binding PreviousMediaCommand}" />
         <KeyBinding Key="N" Command="{Binding NextMediaCommand}" />
 
+        <KeyBinding Key="L" Command="{Binding ToggleRepeatCommand}" />
+        <KeyBinding Key="R" Command="{Binding ToggleRandomCommand}" />
+
         <!--  View  -->
+
+        <KeyBinding Key="L"
+                    Command="{Binding TogglePlaylistCommand}"
+                    Modifiers="Ctrl" />
 
         <KeyBinding Key="T"
                     Command="{Binding ToggleTransparentOnMouseEnter}"
@@ -289,6 +315,13 @@
         </behaviors:EventTrigger>
         <behaviors:EventTrigger EventName="MouseEnter">
             <behaviors:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+
+        <behaviors:EventTrigger EventName="LocationChanged">
+            <behaviors:InvokeCommandAction Command="{Binding WindowLocationChangedCommand}" PassEventArgsToCommand="True" />
+        </behaviors:EventTrigger>
+        <behaviors:EventTrigger EventName="SizeChanged">
+            <behaviors:InvokeCommandAction Command="{Binding WindowSizeChangedCommand}" PassEventArgsToCommand="True" />
         </behaviors:EventTrigger>
 
     </behaviors:Interaction.Triggers>
@@ -377,28 +410,23 @@
                 </Grid.ColumnDefinitions>
                 <ui:CommandBar Grid.Column="0"
                                HorizontalAlignment="Left"
-                               Background="Transparent">
+                               Background="Transparent"
+                               DefaultLabelPosition="Collapsed">
                     <ui:AppBarButton Command="{Binding PlayPauseCommand}"
                                      Icon="{Binding PlayPauseIcon}"
-                                     Label="{Binding PlayPauseLabel}"
-                                     LabelPosition="Collapsed" />
+                                     Label="{Binding PlayPauseLabel}" />
 
                     <ui:AppBarSeparator />
 
-                    <ui:AppBarButton Command="{Binding PreviousMediaCommand}"
-                                     Label="Previous"
-                                     LabelPosition="Collapsed">
+                    <ui:AppBarButton Command="{Binding PreviousMediaCommand}" Label="Previous">
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xF8AC;" />
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton Command="{Binding StopCommand}"
                                      Icon="Stop"
-                                     Label="Stop"
-                                     LabelPosition="Collapsed" />
-                    <ui:AppBarButton Command="{Binding NextMediaCommand}"
-                                     Label="Next"
-                                     LabelPosition="Collapsed">
+                                     Label="Stop" />
+                    <ui:AppBarButton Command="{Binding NextMediaCommand}" Label="Next">
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xF8AD;" />
                         </ui:AppBarButton.Icon>
@@ -406,9 +434,17 @@
 
                     <ui:AppBarSeparator />
 
-                    <ui:AppBarButton Icon="Setting"
-                                     Label="Settings"
-                                     LabelPosition="Collapsed" />
+                    <ui:AppBarToggleButton Icon="OpenWith"
+                                           IsChecked="{Binding ShowPlaylistWindow}"
+                                           Label="Playlist" />
+
+                    <ui:AppBarButton Command="{Binding ToggleRepeatCommand}"
+                                     Icon="{Binding RepeatType, Converter={converters:RepeatTypeToIconConverter}, UpdateSourceTrigger=PropertyChanged}"
+                                     Label="Repeat Type" />
+                    <ui:AppBarToggleButton Icon="Shuffle"
+                                           IsChecked="{Binding IsRandom}"
+                                           Label="Shuffle" />
+
                 </ui:CommandBar>
                 <ui:CommandBar Grid.Column="1" Background="Transparent">
                     <ui:AppBarButton Command="{Binding ToggleMuteCommand}"

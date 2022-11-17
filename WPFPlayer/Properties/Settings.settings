@@ -38,5 +38,26 @@
     <Setting Name="Theme" Type="ModernWpf.ApplicationTheme" Scope="User">
       <Value Profile="(Default)">Dark</Value>
     </Setting>
+    <Setting Name="PlaylistWindowDocked" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PlaylistWindowWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">400</Value>
+    </Setting>
+    <Setting Name="PlaylistWindowHeight" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">600</Value>
+    </Setting>
+    <Setting Name="PlaylistWindowLeft" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="PlaylistWindowTop" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="PlaylistWindowDockTopDelta" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="PlaylistWindowDockBottomDelta" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
