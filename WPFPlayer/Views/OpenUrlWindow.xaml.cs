@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace WPFPlayer.Views
 {
@@ -11,6 +12,18 @@ namespace WPFPlayer.Views
         {
             InitializeComponent();
             Owner = App.Current.MainWindow;
+
+            txtURL.Focus();
+            string clipboard = Clipboard.GetText();
+            if(!string.IsNullOrWhiteSpace(clipboard))
+            {
+                Uri uri;
+                if(Uri.TryCreate(clipboard, UriKind.RelativeOrAbsolute, out uri))
+                {
+                    txtURL.Text = clipboard;
+                    txtURL.SelectAll();
+                }
+            }
         }
 
         public string URL
