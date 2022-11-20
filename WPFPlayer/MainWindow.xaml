@@ -11,6 +11,7 @@
         xmlns:local="clr-namespace:WPFPlayer"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:properties="clr-namespace:WPFPlayer.Properties"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:views="clr-namespace:WPFPlayer.Views"
         xmlns:vm="clr-namespace:WPFPlayer.ViewModels"
@@ -83,6 +84,34 @@
                     <MenuItem.Icon>
                         <ui:FontIcon Glyph="&#xE740;" />
                     </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding ResizeWindowCommand}"
+                          Header="50%"
+                          InputGestureText="1">
+                    <MenuItem.CommandParameter>
+                        <system:Double>0.5</system:Double>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Command="{Binding ResizeWindowCommand}"
+                          Header="100%"
+                          InputGestureText="2">
+                    <MenuItem.CommandParameter>
+                        <system:Double>1</system:Double>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Command="{Binding ResizeWindowCommand}"
+                          Header="150%"
+                          InputGestureText="3">
+                    <MenuItem.CommandParameter>
+                        <system:Double>1.5</system:Double>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Command="{Binding ResizeWindowCommand}"
+                          Header="200%"
+                          InputGestureText="4">
+                    <MenuItem.CommandParameter>
+                        <system:Double>2</system:Double>
+                    </MenuItem.CommandParameter>
                 </MenuItem>
                 <Separator />
                 <MenuItem Header="Crop">
@@ -251,6 +280,26 @@
         <!--  Video  -->
 
         <KeyBinding Key="F11" Command="{Binding ToggleFullScreenCommand}" />
+        <KeyBinding Key="D1" Command="{Binding ResizeWindowCommand}">
+            <KeyBinding.CommandParameter>
+                <system:Double>0.5</system:Double>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D2" Command="{Binding ResizeWindowCommand}">
+            <KeyBinding.CommandParameter>
+                <system:Double>1</system:Double>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D3" Command="{Binding ResizeWindowCommand}">
+            <KeyBinding.CommandParameter>
+                <system:Double>1.5</system:Double>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D4" Command="{Binding ResizeWindowCommand}">
+            <KeyBinding.CommandParameter>
+                <system:Double>2</system:Double>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
 
         <KeyBinding Key="C" Command="{Binding ToggleVideoCropCommand}" />
 

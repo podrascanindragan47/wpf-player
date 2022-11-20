@@ -350,11 +350,11 @@ namespace WPFPlayer.ViewModels
                 {
                     if (IsMinimalInterface)
                     {
-                        Height -= 124;
+                        Height -= MINUI_DELTA;
                     }
                     else
                     {
-                        Height += 124;
+                        Height += MINUI_DELTA;
                     }
                 }
             }
@@ -841,6 +841,25 @@ namespace WPFPlayer.ViewModels
             ShowPlaylistWindow = !ShowPlaylistWindow;
         }));
 
+        private RelayCommand<double> _resizeWindowCommand;
+        public RelayCommand<double> ResizeWindowCommand => _resizeWindowCommand ?? (_resizeWindowCommand = new RelayCommand<double>((o) =>
+        {
+            if(!Media.IsOpen || WindowState != WindowState.Normal)
+            {
+                return;
+            }
+
+            int width = (int)(Media.NaturalVideoWidth * o);
+            int height = (int)(Media.NaturalVideoHeight * o);
+            Width = width + 2;
+            Height = IsMinimalInterface ? height + 2 : height + 2 + MINUI_DELTA;
+
+            Messenger.Send(new NotificationBarMessage
+            {
+                Message = $"Zoom: {(int)(o*100)}%"
+            });
+        }));
+
         public void UpdatePlaylistWindowPosition()
         {
             if (PlaylistViewModel.Instance != null && PlaylistViewModel.Instance.IsDocked && WindowState == WindowState.Normal)
@@ -950,5 +969,7 @@ namespace WPFPlayer.ViewModels
             PlaylistViewModel.Instance.CurrentItem = message.Item;
             await startMedia();
         }
+
+        private static readonly double MINUI_DELTA = 124;
     }
 }
