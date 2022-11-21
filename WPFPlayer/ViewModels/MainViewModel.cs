@@ -587,17 +587,7 @@ namespace WPFPlayer.ViewModels
             {
                 if(IsPlaying)
                 {
-                    if (Media.IsNetworkStream && Media.IsSeekable && (TotalTime - Media.Position).TotalSeconds >= 3)
-                    {
-                        var currentPosition = Media.Position;
-                        App.Current.Dispatcher.Invoke(async () =>
-                        {
-                            await startMedia(currentPosition);
-                        });
-                        return;
-                    }
-
-                    if(Media.Position.TotalSeconds < 0.5)
+                    if (isEndedMedia())
                     {
                         var nextItem = PlaylistViewModel.Instance.GetNextMedia();
                         if (nextItem != null)
@@ -616,10 +606,28 @@ namespace WPFPlayer.ViewModels
                     }
                     else
                     {
-                        App.Current.Dispatcher.Invoke(async () =>
+                        if(Media.IsLiveStream)
                         {
-                            await Media.Play();
-                        });
+                            App.Current.Dispatcher.Invoke(async () =>
+                            {
+                                await startMedia();
+                            });
+                        }
+                        else if(Media.IsNetworkStream)
+                        {
+                            var currentPosition = Media.Position;
+                            App.Current.Dispatcher.Invoke(async () =>
+                            {
+                                await startMedia(currentPosition);
+                            });
+                        }
+                        else
+                        {
+                            App.Current.Dispatcher.Invoke(async () =>
+                            {
+                                await Media.Play();
+                            });
+                        }
                     }
                 }
             }
@@ -695,6 +703,7 @@ namespace WPFPlayer.ViewModels
                 if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
                 {
                     WindowState = WindowState.Minimized;
+                    IsPlaying = false;
                     await Media.Pause();
                 }
                 else
@@ -879,10 +888,13 @@ namespace WPFPlayer.ViewModels
             IsPlaying = true;
 
             await Media.Open(PlaylistViewModel.Instance.CurrentItem.Data.MediaSource);
-            Media.Position = startPostion ?? TimeSpan.Zero;
             TotalTime = Media.NaturalDuration ?? TimeSpan.Zero;
             updateVideoFilter();
             await Media.Play();
+            if(startPostion.HasValue)
+            {
+                Media.Position = startPostion.Value;
+            }
 
             IsLoading = false;
 
@@ -961,6 +973,31 @@ namespace WPFPlayer.ViewModels
             {
                 _timerHideCursor.Start();
             }
+        }
+
+        private bool isEndedMedia()
+        {
+            if(Media.IsLiveStream)
+            {
+                return false;
+            }
+
+            if(Media.IsAtEndOfStream)
+            {
+                if(Media.IsNetworkStream && Media.IsSeekable)
+                {
+                    if(Math.Abs((TotalTime - Media.Position).TotalSeconds) < 1)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public async void Receive(PlayItemMessage message)
