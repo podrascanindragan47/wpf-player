@@ -238,6 +238,15 @@ namespace WPFPlayer.ViewModels
                 {
                     return;
                 }
+
+                if(Settings.Default.WindowState == WindowState.Minimized && value == WindowState.Normal && MinimizeOnMouseEnter && Media.MediaState == MediaPlaybackState.Pause)
+                {
+                    App.Current.Dispatcher.Invoke(async () =>
+                    {
+                        await Media.Play();
+                    });
+                }
+
                 Settings.Default.WindowState = value;
                 OnPropertyChanged(nameof(WindowState));
                 OnPropertyChanged(nameof(IsMinimalInterface));
