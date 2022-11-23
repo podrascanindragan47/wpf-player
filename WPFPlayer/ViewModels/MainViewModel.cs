@@ -243,6 +243,7 @@ namespace WPFPlayer.ViewModels
                 {
                     App.Current.Dispatcher.Invoke(async () =>
                     {
+                        IsPlaying = true;
                         await Media.Play();
                     });
                 }
