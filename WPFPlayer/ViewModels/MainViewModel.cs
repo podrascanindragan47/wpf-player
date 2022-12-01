@@ -58,8 +58,8 @@ namespace WPFPlayer.ViewModels
                     .Where(x => Constants.MediaFileExtensions.Any(y => x.EndsWith("." + y, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
 
-                PlaylistViewModel.Instance.AddFiles(new List<string> { args[1] }, true);
                 PlaylistViewModel.Instance.AddFiles(files);
+                PlaylistViewModel.Instance.CurrentItem = PlaylistViewModel.Instance.Items.First(x => x.Data.MediaSource == new Uri(args[1]));
 
                 await startMedia();
             }
