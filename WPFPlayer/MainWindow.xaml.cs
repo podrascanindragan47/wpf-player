@@ -73,7 +73,7 @@ namespace WPFPlayer
 
         private void timerPreventSleep_Tick(object sender, EventArgs e)
         {
-            if(Media.IsPlaying)
+            if(MainViewModel.Instance.IsPlaying)
             {
                 Kernel32.SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_AWAYMODE_REQUIRED | EXECUTION_STATE.ES_DISPLAY_REQUIRED);
             }

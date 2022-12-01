@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-    <version>0.1.4</version>
-    <url>https://github.com/podrascanindragan47/wpf-player/releases/download/v0.1.4/WPFPlayer.exe</url>
-    <changelog>https://github.com/podrascanindragan47/wpf-player/releases/tag/v0.1.4</changelog>
+    <version>0.1.5</version>
+    <url>https://github.com/podrascanindragan47/wpf-player/releases/download/v0.1.5/WPFPlayer.exe</url>
+    <changelog>https://github.com/podrascanindragan47/wpf-player/releases/tag/v0.1.5</changelog>
     <mandatory>false</mandatory>
 </item>
