@@ -894,7 +894,10 @@ namespace WPFPlayer.ViewModels
 
         private async Task startMedia(TimeSpan? startPostion = null)
         {
-            IsLoading = true;
+            if(!PlaylistViewModel.Instance.CurrentItem.Data.MediaSource.IsFile)
+            {
+                IsLoading = true;
+            }
             IsPlaying = true;
 
             await Media.Open(PlaylistViewModel.Instance.CurrentItem.Data.MediaSource);
@@ -906,7 +909,10 @@ namespace WPFPlayer.ViewModels
                 Media.Position = startPostion.Value;
             }
 
-            IsLoading = false;
+            if (!PlaylistViewModel.Instance.CurrentItem.Data.MediaSource.IsFile)
+            {
+                IsLoading = false;
+            }
 
             _timerHideCursor.Start();
         }
