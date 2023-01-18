@@ -1,7 +1,7 @@
 # WPF Player
 
 ## Downloads
-![Windows Installer](https://github.com/podrascanindragan47/wpf-player/releases/latest/download/WPFPlayer.exe)
+[Windows Installer](https://github.com/podrascanindragan47/wpf-player/releases/latest/download/WPFPlayer.exe)
 
 ## Screenshots
 
